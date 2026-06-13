@@ -6,6 +6,7 @@ import { Car } from '../entities/Car.js';
 import { InputSystem } from '../systems/InputSystem.js';
 import { TimerSystem } from '../systems/TimerSystem.js';
 import { gameConfig } from '../config/gameConfig.js';
+import { LocalRecordRepository } from '../repositories/LocalRecordRepository.js';
 
 export class RaceScene extends Phaser.Scene {
   constructor() {
@@ -26,6 +27,11 @@ export class RaceScene extends Phaser.Scene {
     this.carHeading = 0;
     this.trackRotation = 0;
     this.steeringAngle = 0;
+    this.dustParticles = [];
+    this.dustSpawnTimer = 0;
+    this.sectorSplitTimes = [null, null];
+    this.sectorTimes = [null, null, null];
+    this.nextSectorSplitIndex = 0;
 
     const trackRepository = new TrackRepository();
     const carRepository = new CarRepository();
@@ -46,6 +52,7 @@ export class RaceScene extends Phaser.Scene {
     this.car = new Car(this, this.carData, gameConfig.car);
     this.inputSystem = new InputSystem(this);
     this.timerSystem = new TimerSystem();
+    this.recordRepository = new LocalRecordRepository();
 
     this.createHud();
     this.layoutScene();
@@ -77,7 +84,13 @@ export class RaceScene extends Phaser.Scene {
       color: '#ffffff'
     }).setDepth(20);
 
-    this.messageText = this.add.text(0, 0, 'Pulsa ▲ para empezar', {
+    this.splitsText = this.add.text(24, 100, 'S1 --:--.--  S2 --:--.--  S3 --:--.--', {
+      fontFamily: 'Arial',
+      fontSize: '16px',
+      color: '#f4d35e'
+    }).setDepth(20);
+
+    this.messageText = this.add.text(0, 0, 'Pulsa cualquier botón para empezar', {
       fontFamily: 'Arial',
       fontSize: '30px',
       color: '#ffffff',
@@ -111,22 +124,24 @@ export class RaceScene extends Phaser.Scene {
     const projectionBeforeMove = this.updateTrackProjection();
     const isOnRoad = this.track.isOnRoad(projectionBeforeMove.lateralOffset);
 
-    if (inputState.accelerating && !this.hasStarted) {
+    if (inputState.hasInput && !this.hasStarted) {
       this.hasStarted = true;
       this.timerSystem.start(time);
       this.messageText.setVisible(false);
       this.requestFullscreenOnce();
     }
 
-    this.updateRallyState(deltaSeconds, inputState, turnDirection, isOnRoad);
+    this.updateRallyState(deltaSeconds, turnDirection, isOnRoad);
     this.updateTrackProjection();
     this.car.setVisualTurn(Phaser.Math.RadToDeg(this.getCarVisualAngle()));
     this.updateWorldTransform();
+    this.updateDust(deltaSeconds);
 
     if (this.hasStarted) {
       this.timeText.setText(`Tiempo ${this.timerSystem.format(this.timerSystem.getElapsed(time))}`);
       this.sectorText.setText(`Sector ${this.track.getSectorIndex(this.progressDistance)}/3`);
       this.progressText.setText(`Progreso ${Math.floor(this.track.getProgress(this.progressDistance) * 100)}%`);
+      this.updateSectorTimes(time);
 
       if (this.progressDistance >= this.track.totalLength - this.trackData.finishPadding) {
         this.finishRace(time);
@@ -134,8 +149,8 @@ export class RaceScene extends Phaser.Scene {
     }
   }
 
-  updateRallyState(deltaSeconds, inputState, turnDirection, isOnRoad) {
-    const acceleration = inputState.accelerating ? gameConfig.car.acceleration : 0;
+  updateRallyState(deltaSeconds, turnDirection, isOnRoad) {
+    const acceleration = this.hasStarted ? gameConfig.car.acceleration : 0;
     const friction = isOnRoad ? gameConfig.car.roadFriction : gameConfig.car.offRoadFriction;
     const maxSpeed = isOnRoad ? gameConfig.car.maxSpeed : gameConfig.car.offRoadMaxSpeed;
 
@@ -151,6 +166,92 @@ export class RaceScene extends Phaser.Scene {
 
     this.worldPosition.x += Math.cos(this.carHeading) * this.speed * deltaSeconds;
     this.worldPosition.y += Math.sin(this.carHeading) * this.speed * deltaSeconds;
+  }
+
+  updateSectorTimes(time) {
+    while (
+      this.nextSectorSplitIndex < this.track.sectorDistances.length
+      && this.progressDistance >= this.track.sectorDistances[this.nextSectorSplitIndex]
+    ) {
+      const elapsed = this.timerSystem.getElapsed(time);
+      this.sectorSplitTimes[this.nextSectorSplitIndex] = elapsed;
+
+      if (this.nextSectorSplitIndex === 0) {
+        this.sectorTimes[0] = elapsed;
+      } else {
+        this.sectorTimes[1] = elapsed - this.sectorSplitTimes[0];
+      }
+
+      this.nextSectorSplitIndex += 1;
+      this.updateSplitsHud();
+    }
+  }
+
+  updateSplitsHud() {
+    this.splitsText.setText(
+      this.sectorTimes
+        .map((sectorTime, index) => `S${index + 1} ${sectorTime === null ? '--:--.--' : this.timerSystem.format(sectorTime)}`)
+        .join('  ')
+    );
+  }
+
+  updateDust(deltaSeconds) {
+    if (!gameConfig.dust.enabled || !this.hasStarted || this.speed < gameConfig.dust.minimumSpeed) {
+      this.updateDustParticles(deltaSeconds);
+      return;
+    }
+
+    this.dustSpawnTimer += deltaSeconds * 1000;
+
+    while (this.dustSpawnTimer >= gameConfig.dust.spawnEveryMilliseconds) {
+      this.dustSpawnTimer -= gameConfig.dust.spawnEveryMilliseconds;
+      this.spawnDustParticle();
+    }
+
+    this.updateDustParticles(deltaSeconds);
+  }
+
+  spawnDustParticle() {
+    const carAngle = this.getCarVisualAngle();
+    const rearX = this.carScreenPosition.x - Math.sin(carAngle) * gameConfig.dust.rearOffset;
+    const rearY = this.carScreenPosition.y + Math.cos(carAngle) * gameConfig.dust.rearOffset;
+    const sideX = Math.cos(carAngle);
+    const sideY = Math.sin(carAngle);
+    const offset = Phaser.Math.Between(-gameConfig.dust.spread, gameConfig.dust.spread);
+    const particle = this.add.circle(
+      rearX + sideX * offset,
+      rearY + sideY * offset,
+      gameConfig.dust.startRadius + Math.random() * 4,
+      gameConfig.dust.color,
+      0.38
+    );
+
+    particle.setDepth(6);
+
+    this.dustParticles.push({
+      shape: particle,
+      driftX: sideX * offset * 0.35,
+      driftY: sideY * offset * 0.35 + 20,
+      alpha: 0.38
+    });
+  }
+
+  updateDustParticles(deltaSeconds) {
+    this.dustParticles = this.dustParticles.filter((particle) => {
+      particle.alpha -= gameConfig.dust.fadePerSecond * deltaSeconds;
+
+      if (particle.alpha <= 0) {
+        particle.shape.destroy();
+        return false;
+      }
+
+      particle.shape.x += particle.driftX * deltaSeconds;
+      particle.shape.y += particle.driftY * deltaSeconds;
+      particle.shape.setRadius(particle.shape.radius + gameConfig.dust.growthPerSecond * deltaSeconds);
+      particle.shape.setAlpha(particle.alpha);
+
+      return true;
+    });
   }
 
   updateTrackRotation(deltaSeconds, turnDirection) {
@@ -246,12 +347,44 @@ export class RaceScene extends Phaser.Scene {
   finishRace(time) {
     this.isFinished = true;
     this.timerSystem.finish(time);
-    const finalTime = this.timerSystem.format(this.timerSystem.getElapsed(time));
+    const totalTime = this.timerSystem.getElapsed(time);
+    const finalTime = this.timerSystem.format(totalTime);
+    this.updateSectorTimes(time);
+    this.sectorTimes[2] = totalTime - (this.sectorSplitTimes[1] ?? this.sectorSplitTimes[0] ?? 0);
+    this.updateSplitsHud();
+
+    const result = this.recordRepository.saveRun(this.trackData.id, {
+      totalTime,
+      sectorTimes: this.sectorTimes
+    });
 
     this.messageText
-      .setText(`Final: ${finalTime}\nPulsa para reiniciar`)
+      .setText(this.createFinishSummary(finalTime, totalTime, result))
+      .setFontSize(22)
       .setVisible(true)
       .setInteractive({ useHandCursor: true })
       .once('pointerdown', () => this.scene.restart());
+  }
+
+  createFinishSummary(finalTime, totalTime, result) {
+    const previousTotal = result.previous.bestTotal;
+    const totalRecordText = previousTotal === null || totalTime < previousTotal
+      ? 'Record total nuevo'
+      : `Record total ${this.timerSystem.format(previousTotal)}`;
+    const sectorLines = this.sectorTimes.map((sectorTime, index) => {
+      const previousSector = result.previous.bestSectors[index];
+      const recordText = previousSector === null || sectorTime < previousSector
+        ? 'record'
+        : `rec ${this.timerSystem.format(previousSector)}`;
+
+      return `S${index + 1} ${this.timerSystem.format(sectorTime)} (${recordText})`;
+    });
+
+    return [
+      `Final ${finalTime}`,
+      totalRecordText,
+      ...sectorLines,
+      'Pulsa para reiniciar'
+    ].join('\n');
   }
 }
