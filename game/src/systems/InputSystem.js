@@ -1,7 +1,7 @@
 export class InputSystem {
   constructor(scene) {
     this.scene = scene;
-    this.state = {
+    this.touchState = {
       turningLeft: false,
       turningRight: false,
       accelerating: false
@@ -50,23 +50,23 @@ export class InputSystem {
 
   bindButton(button, stateKey) {
     button.on('pointerdown', () => {
-      this.state[stateKey] = true;
+      this.touchState[stateKey] = true;
     });
 
     button.on('pointerup', () => {
-      this.state[stateKey] = false;
+      this.touchState[stateKey] = false;
     });
 
     button.on('pointerout', () => {
-      this.state[stateKey] = false;
+      this.touchState[stateKey] = false;
     });
   }
 
   update() {
-    this.state.turningLeft = this.state.turningLeft || this.cursors.left.isDown || this.keys.left.isDown;
-    this.state.turningRight = this.state.turningRight || this.cursors.right.isDown || this.keys.right.isDown;
-    this.state.accelerating = this.state.accelerating || this.cursors.up.isDown || this.keys.accelerate.isDown;
-
-    return this.state;
+    return {
+      turningLeft: this.touchState.turningLeft || this.cursors.left.isDown || this.keys.left.isDown,
+      turningRight: this.touchState.turningRight || this.cursors.right.isDown || this.keys.right.isDown,
+      accelerating: this.touchState.accelerating || this.cursors.up.isDown || this.keys.accelerate.isDown
+    };
   }
 }
