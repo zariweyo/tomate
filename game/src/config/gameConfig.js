@@ -17,6 +17,16 @@ export const gameConfig = {
     trackFollowDegreesPerSecond: 180,
     trackReturnDegreesPerSecond: 45
   },
+  drift: {
+    enabled: true,
+    minimumSpeed: 210,
+    minimumSteeringDegrees: 18,
+    gripRecoveryPerSecond: 3.2,
+    slideRecoveryPerSecond: 1.15,
+    slideStrength: 0.34,
+    speedLossPerSecond: 0.12,
+    dustMultiplier: 2.4
+  },
   camera: {
     carVerticalPosition: 0.75,
     messageVerticalPosition: 0.42
