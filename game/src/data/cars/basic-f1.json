@@ -4,11 +4,5 @@
   "width": 28,
   "height": 58,
   "spriteKey": "basic-f1",
-  "spritePath": "assets/cars/f1-car.svg",
-  "maxSpeed": 315,
-  "offTrackMaxSpeed": 70,
-  "acceleration": 190,
-  "friction": 0.985,
-  "offTrackFriction": 0.9,
-  "turnSpeed": 170
+  "spritePath": "assets/cars/f1-car.svg"
 }

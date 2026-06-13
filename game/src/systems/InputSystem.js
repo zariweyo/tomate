@@ -9,6 +9,9 @@ export class InputSystem {
 
     this.createKeyboardControls();
     this.createTouchControls();
+    this.layoutControls();
+
+    this.scene.scale.on('resize', () => this.layoutControls());
   }
 
   createKeyboardControls() {
@@ -21,17 +24,17 @@ export class InputSystem {
   }
 
   createTouchControls() {
-    this.accelerateButton = this.createButton(110, 440, '▲', 86, true);
-    this.leftButton = this.createButton(795, 440, '←', 74, false);
-    this.rightButton = this.createButton(890, 440, '→', 74, false);
+    this.accelerateButton = this.createButton('▲', 86, true);
+    this.leftButton = this.createButton('←', 74, false);
+    this.rightButton = this.createButton('→', 74, false);
 
     this.bindButton(this.accelerateButton, 'accelerating');
     this.bindButton(this.leftButton, 'turningLeft');
     this.bindButton(this.rightButton, 'turningRight');
   }
 
-  createButton(x, y, label, size, isPrimary) {
-    const button = this.scene.add.container(x, y);
+  createButton(label, size, isPrimary) {
+    const button = this.scene.add.container(0, 0);
     const background = this.scene.add.circle(0, 0, size / 2, isPrimary ? 0xb22222 : 0x24242c, 0.9).setStrokeStyle(4, 0xffffff, 0.95);
     const text = this.scene.add.text(0, -2, label, {
       fontFamily: 'Arial',
@@ -46,6 +49,16 @@ export class InputSystem {
     button.setDepth(10);
 
     return button;
+  }
+
+  layoutControls() {
+    const width = this.scene.scale.width;
+    const height = this.scene.scale.height;
+    const bottom = height - 72;
+
+    this.accelerateButton.setPosition(86, bottom);
+    this.leftButton.setPosition(width - 158, bottom);
+    this.rightButton.setPosition(width - 68, bottom);
   }
 
   bindButton(button, stateKey) {
