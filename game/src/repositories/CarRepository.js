@@ -1,11 +1,17 @@
+const carModules = import.meta.glob('../data/cars/*.json', {
+  eager: true,
+  import: 'default'
+});
+
 export class CarRepository {
   async getCarById(carId) {
-    const response = await fetch(`./src/data/cars/${carId}.json`);
+    const carPath = `../data/cars/${carId}.json`;
+    const car = carModules[carPath];
 
-    if (!response.ok) {
+    if (!car) {
       throw new Error(`Car not found: ${carId}`);
     }
 
-    return response.json();
+    return car;
   }
 }
