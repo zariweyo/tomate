@@ -25,13 +25,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install game dependencies
+        run: npm install
+        working-directory: game
+
+      - name: Build game
+        run: npm run build
+        working-directory: game
+
+      - name: Prepare GitHub Pages artifact
+        run: |
+          mkdir -p public-site/game
+          cp index.html public-site/index.html
+          cp -R game/dist/* public-site/game/
+
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
 
       - name: Upload static files
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: public-site
 
       - name: Deploy to GitHub Pages
         id: deployment
