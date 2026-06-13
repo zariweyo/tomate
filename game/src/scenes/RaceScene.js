@@ -1,4 +1,4 @@
-import f1CarSpriteUrl from '../assets/cars/f1-car.svg';
+import f1CarSpriteUrl from '../assets/cars/f1-car.svg?no-inline';
 import { TrackRepository } from '../repositories/TrackRepository.js';
 import { CarRepository } from '../repositories/CarRepository.js';
 import { Track } from '../entities/Track.js';
