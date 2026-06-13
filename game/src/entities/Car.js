@@ -6,7 +6,8 @@ export class Car {
     this.rotationDegrees = startPosition.angle;
 
     this.sprite = scene.add.image(startPosition.x, startPosition.y, carData.spriteKey);
-    this.sprite.setDisplaySize(carData.width, carData.height);
+    const scale = Math.min(carData.width / this.sprite.width, carData.height / this.sprite.height);
+    this.sprite.setScale(scale);
     this.sprite.setRotation(Phaser.Math.DegToRad(this.rotationDegrees));
   }
 
