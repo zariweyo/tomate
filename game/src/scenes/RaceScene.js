@@ -25,8 +25,10 @@ export class RaceScene extends Phaser.Scene {
     this.lateralOffset = 0;
     this.speed = 0;
     this.carHeading = 0;
+    this.velocityHeading = 0;
     this.trackRotation = 0;
     this.steeringAngle = 0;
+    this.driftAmount = 0;
     this.dustParticles = [];
     this.dustSpawnTimer = 0;
     this.sectorSplitTimes = [null, null];
@@ -48,6 +50,7 @@ export class RaceScene extends Phaser.Scene {
     this.progressDistance = this.trackData.startDistance;
     this.worldPosition = this.track.getPositionAt(this.progressDistance, 0);
     this.carHeading = this.worldPosition.angle;
+    this.velocityHeading = this.carHeading;
     this.trackRotation = this.getAlignedTrackRotation();
     this.car = new Car(this, this.carData, gameConfig.car);
     this.inputSystem = new InputSystem(this);
@@ -162,10 +165,48 @@ export class RaceScene extends Phaser.Scene {
 
     const yawRate = this.speed / gameConfig.steering.wheelBase * Math.tan(this.steeringAngle);
     this.carHeading += yawRate * deltaSeconds;
+    this.updateDrift(deltaSeconds, isOnRoad);
     this.updateTrackRotation(deltaSeconds, turnDirection);
 
-    this.worldPosition.x += Math.cos(this.carHeading) * this.speed * deltaSeconds;
-    this.worldPosition.y += Math.sin(this.carHeading) * this.speed * deltaSeconds;
+    const forwardX = Math.cos(this.velocityHeading);
+    const forwardY = Math.sin(this.velocityHeading);
+    const sideX = Math.cos(this.carHeading + Math.PI / 2) * Math.sign(this.steeringAngle);
+    const sideY = Math.sin(this.carHeading + Math.PI / 2) * Math.sign(this.steeringAngle);
+    const slideForce = this.speed * this.driftAmount * gameConfig.drift.slideStrength;
+
+    this.worldPosition.x += (forwardX * this.speed + sideX * slideForce) * deltaSeconds;
+    this.worldPosition.y += (forwardY * this.speed + sideY * slideForce) * deltaSeconds;
+  }
+
+  updateDrift(deltaSeconds, isOnRoad) {
+    if (!gameConfig.drift.enabled) {
+      this.driftAmount = 0;
+      this.velocityHeading = this.carHeading;
+      return;
+    }
+
+    const steeringDegrees = Math.abs(Phaser.Math.RadToDeg(this.steeringAngle));
+    const wantsToDrift = this.speed >= gameConfig.drift.minimumSpeed
+      && steeringDegrees >= gameConfig.drift.minimumSteeringDegrees;
+    const targetDrift = wantsToDrift ? Phaser.Math.Clamp(
+      (steeringDegrees - gameConfig.drift.minimumSteeringDegrees)
+        / Math.max(1, gameConfig.steering.maxSteeringDegrees - gameConfig.drift.minimumSteeringDegrees),
+      0,
+      1
+    ) : 0;
+    const recovery = targetDrift > this.driftAmount
+      ? gameConfig.drift.slideRecoveryPerSecond
+      : gameConfig.drift.gripRecoveryPerSecond;
+
+    this.driftAmount = Phaser.Math.Linear(this.driftAmount, targetDrift, recovery * deltaSeconds);
+
+    if (!isOnRoad) {
+      this.driftAmount = Math.max(this.driftAmount, 0.35);
+    }
+
+    const headingGrip = Phaser.Math.Linear(8, 1.6, this.driftAmount) * deltaSeconds;
+    this.velocityHeading = this.rotateAngleTowards(this.velocityHeading, this.carHeading, headingGrip);
+    this.speed *= 1 - this.driftAmount * gameConfig.drift.speedLossPerSecond * deltaSeconds;
   }
 
   updateSectorTimes(time) {
@@ -203,8 +244,10 @@ export class RaceScene extends Phaser.Scene {
 
     this.dustSpawnTimer += deltaSeconds * 1000;
 
-    while (this.dustSpawnTimer >= gameConfig.dust.spawnEveryMilliseconds) {
-      this.dustSpawnTimer -= gameConfig.dust.spawnEveryMilliseconds;
+    const dustInterval = gameConfig.dust.spawnEveryMilliseconds / Phaser.Math.Linear(1, gameConfig.drift.dustMultiplier, this.driftAmount);
+
+    while (this.dustSpawnTimer >= dustInterval) {
+      this.dustSpawnTimer -= dustInterval;
       this.spawnDustParticle();
     }
 
@@ -217,13 +260,14 @@ export class RaceScene extends Phaser.Scene {
     const rearY = this.carScreenPosition.y + Math.cos(carAngle) * gameConfig.dust.rearOffset;
     const sideX = Math.cos(carAngle);
     const sideY = Math.sin(carAngle);
-    const offset = Phaser.Math.Between(-gameConfig.dust.spread, gameConfig.dust.spread);
+    const spread = gameConfig.dust.spread * Phaser.Math.Linear(1, 1.8, this.driftAmount);
+    const offset = Phaser.Math.Between(-spread, spread);
     const particle = this.add.circle(
       rearX + sideX * offset,
       rearY + sideY * offset,
-      gameConfig.dust.startRadius + Math.random() * 4,
+      gameConfig.dust.startRadius + Math.random() * 4 + this.driftAmount * 5,
       gameConfig.dust.color,
-      0.38
+      Phaser.Math.Linear(0.38, 0.62, this.driftAmount)
     );
 
     particle.setDepth(6);
@@ -232,7 +276,7 @@ export class RaceScene extends Phaser.Scene {
       shape: particle,
       driftX: sideX * offset * 0.35,
       driftY: sideY * offset * 0.35 + 20,
-      alpha: 0.38
+      alpha: Phaser.Math.Linear(0.38, 0.62, this.driftAmount)
     });
   }
 
