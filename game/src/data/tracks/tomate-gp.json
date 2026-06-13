@@ -1,0 +1,57 @@
+{
+  "id": "tomate-gp",
+  "name": "Tomate GP",
+  "laps": 3,
+  "world": {
+    "width": 900,
+    "height": 620
+  },
+  "startPosition": {
+    "x": 450,
+    "y": 505,
+    "angle": -90
+  },
+  "track": {
+    "center": {
+      "x": 450,
+      "y": 310
+    },
+    "outerRadius": {
+      "x": 360,
+      "y": 230
+    },
+    "innerRadius": {
+      "x": 185,
+      "y": 95
+    }
+  },
+  "finishLine": {
+    "x": 450,
+    "y": 505,
+    "width": 170,
+    "height": 18
+  },
+  "checkpoints": [
+    {
+      "id": "east",
+      "x": 765,
+      "y": 310,
+      "width": 22,
+      "height": 160
+    },
+    {
+      "id": "north",
+      "x": 450,
+      "y": 112,
+      "width": 170,
+      "height": 22
+    },
+    {
+      "id": "west",
+      "x": 135,
+      "y": 310,
+      "width": 22,
+      "height": 160
+    }
+  ]
+}
