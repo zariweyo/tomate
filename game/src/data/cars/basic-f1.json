@@ -1,0 +1,11 @@
+{
+  "id": "basic-f1",
+  "name": "Basic F1",
+  "width": 20,
+  "height": 40,
+  "maxSpeed": 310,
+  "acceleration": 185,
+  "friction": 0.985,
+  "offTrackFriction": 0.94,
+  "turnSpeed": 165
+}
