@@ -3,8 +3,7 @@ export class InputSystem {
     this.scene = scene;
     this.touchState = {
       turningLeft: false,
-      turningRight: false,
-      accelerating: false
+      turningRight: false
     };
 
     this.createKeyboardControls();
@@ -18,17 +17,14 @@ export class InputSystem {
     this.cursors = this.scene.input.keyboard.createCursorKeys();
     this.keys = this.scene.input.keyboard.addKeys({
       left: Phaser.Input.Keyboard.KeyCodes.A,
-      right: Phaser.Input.Keyboard.KeyCodes.D,
-      accelerate: Phaser.Input.Keyboard.KeyCodes.W
+      right: Phaser.Input.Keyboard.KeyCodes.D
     });
   }
 
   createTouchControls() {
-    this.accelerateButton = this.createButton('▲', 86, true);
     this.leftButton = this.createButton('←', 74, false);
     this.rightButton = this.createButton('→', 74, false);
 
-    this.bindButton(this.accelerateButton, 'accelerating');
     this.bindButton(this.leftButton, 'turningLeft');
     this.bindButton(this.rightButton, 'turningRight');
   }
@@ -56,9 +52,8 @@ export class InputSystem {
     const height = this.scene.scale.height;
     const bottom = height - 72;
 
-    this.accelerateButton.setPosition(86, bottom);
-    this.leftButton.setPosition(width - 158, bottom);
-    this.rightButton.setPosition(width - 68, bottom);
+    this.leftButton.setPosition(76, bottom);
+    this.rightButton.setPosition(width - 76, bottom);
   }
 
   bindButton(button, stateKey) {
@@ -80,10 +75,13 @@ export class InputSystem {
   }
 
   update() {
+    const turningLeft = this.touchState.turningLeft || this.cursors.left.isDown || this.keys.left.isDown;
+    const turningRight = this.touchState.turningRight || this.cursors.right.isDown || this.keys.right.isDown;
+
     return {
-      turningLeft: this.touchState.turningLeft || this.cursors.left.isDown || this.keys.left.isDown,
-      turningRight: this.touchState.turningRight || this.cursors.right.isDown || this.keys.right.isDown,
-      accelerating: this.touchState.accelerating || this.cursors.up.isDown || this.keys.accelerate.isDown
+      turningLeft,
+      turningRight,
+      hasInput: turningLeft || turningRight
     };
   }
 }

@@ -20,5 +20,16 @@ export const gameConfig = {
   camera: {
     carVerticalPosition: 0.75,
     messageVerticalPosition: 0.42
+  },
+  dust: {
+    enabled: true,
+    spawnEveryMilliseconds: 38,
+    minimumSpeed: 45,
+    rearOffset: 34,
+    spread: 18,
+    startRadius: 6,
+    growthPerSecond: 28,
+    fadePerSecond: 1.7,
+    color: 0xc8a66a
   }
 };
