@@ -12,13 +12,14 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 24px;
       font-family: Arial, sans-serif;
       background: #fff7f2;
     }
 
     h1 {
       color: #b22222;
-      margin-bottom: 24px;
+      margin: 0;
     }
 
     img {
@@ -28,6 +29,21 @@
       border-radius: 16px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
     }
+
+    .race-button {
+      display: inline-block;
+      padding: 14px 24px;
+      border-radius: 999px;
+      color: #ffffff;
+      background: #b22222;
+      text-decoration: none;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(178, 34, 34, 0.28);
+    }
+
+    .race-button:hover {
+      background: #8f1b1b;
+    }
   </style>
 </head>
 <body>
@@ -36,5 +52,6 @@
     src="https://upload.wikimedia.org/wikipedia/commons/8/89/Tomato_je.jpg"
     alt="Imagen de un tomate"
   />
+  <a class="race-button" href="./game/index.html">Empezar carrera</a>
 </body>
 </html>
