@@ -3,55 +3,55 @@
   "name": "Tomate GP",
   "laps": 3,
   "world": {
-    "width": 900,
-    "height": 620
+    "width": 960,
+    "height": 540
   },
   "startPosition": {
-    "x": 450,
-    "y": 505,
+    "x": 480,
+    "y": 420,
     "angle": -90
   },
   "track": {
     "center": {
-      "x": 450,
-      "y": 310
+      "x": 480,
+      "y": 245
     },
     "outerRadius": {
-      "x": 360,
-      "y": 230
+      "x": 370,
+      "y": 190
     },
     "innerRadius": {
       "x": 185,
-      "y": 95
+      "y": 78
     }
   },
   "finishLine": {
-    "x": 450,
-    "y": 505,
+    "x": 480,
+    "y": 420,
     "width": 170,
     "height": 18
   },
   "checkpoints": [
     {
       "id": "east",
-      "x": 765,
-      "y": 310,
+      "x": 810,
+      "y": 245,
       "width": 22,
-      "height": 160
+      "height": 140
     },
     {
       "id": "north",
-      "x": 450,
-      "y": 112,
+      "x": 480,
+      "y": 88,
       "width": 170,
       "height": 22
     },
     {
       "id": "west",
-      "x": 135,
-      "y": 310,
+      "x": 150,
+      "y": 245,
       "width": 22,
-      "height": 160
+      "height": 140
     }
   ]
 }
