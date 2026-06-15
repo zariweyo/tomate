@@ -30,7 +30,14 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
     }
 
-    .race-button {
+    .module-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .module-button {
       display: inline-block;
       padding: 14px 24px;
       border-radius: 999px;
@@ -41,8 +48,17 @@
       box-shadow: 0 8px 20px rgba(178, 34, 34, 0.28);
     }
 
-    .race-button:hover {
+    .module-button:hover {
       background: #8f1b1b;
+    }
+
+    .module-button--astro {
+      background: #6d28d9;
+      box-shadow: 0 8px 20px rgba(109, 40, 217, 0.28);
+    }
+
+    .module-button--astro:hover {
+      background: #581c87;
     }
   </style>
 </head>
@@ -52,6 +68,9 @@
     src="https://upload.wikimedia.org/wikipedia/commons/8/89/Tomato_je.jpg"
     alt="Imagen de un tomate"
   />
-  <a class="race-button" href="./game/index.html">Empezar carrera</a>
+  <div class="module-actions">
+    <a class="module-button" href="./game/index.html">Empezar carrera</a>
+    <a class="module-button module-button--astro" href="./astrology/index.html">Astrology</a>
+  </div>
 </body>
 </html>
