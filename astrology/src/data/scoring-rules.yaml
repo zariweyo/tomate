@@ -1,0 +1,38 @@
+weights:
+  zodiac: 60
+  age: 20
+  sex: 10
+  relationship_type: 10
+
+age:
+  perfect_difference: 3
+  acceptable_difference: 10
+  large_difference: 20
+
+relationship_type:
+  love: 88
+  friendship: 82
+  work: 74
+
+sex:
+  same: 82
+  different: 86
+  other: 80
+
+levels:
+  low:
+    min: 0
+    max: 44
+    title: "Compatibilidad baja"
+  medium:
+    min: 45
+    max: 69
+    title: "Compatibilidad media"
+  high:
+    min: 70
+    max: 84
+    title: "Compatibilidad alta"
+  excellent:
+    min: 85
+    max: 100
+    title: "Compatibilidad excelente"
