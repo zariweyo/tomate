@@ -1,0 +1,27 @@
+start: zodiac
+result: result
+
+nodes:
+  zodiac:
+    step: zodiac
+    next: age
+
+  age:
+    step: age
+    branches:
+      - condition:
+          computed: age_difference
+          operator: ">"
+          value: 20
+        next: sex
+      - condition:
+          default: true
+        next: sex
+
+  sex:
+    step: sex
+    next: relationship_type
+
+  relationship_type:
+    step: relationship_type
+    next: result
