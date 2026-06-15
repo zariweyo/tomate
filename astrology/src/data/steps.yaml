@@ -1,0 +1,31 @@
+steps:
+  zodiac:
+    title: "Signos del zodiaco"
+    description: "Empezamos por la energia astrologica base."
+    icon: "Sparkles"
+    fields:
+      - user_sign
+      - partner_sign
+
+  age:
+    title: "Edades"
+    description: "La diferencia de edad ayuda a ajustar el resultado."
+    icon: "Calendar"
+    fields:
+      - user_age
+      - partner_age
+
+  sex:
+    title: "Sexo"
+    description: "Este dato queda listo para futuras reglas del arbol."
+    icon: "Users"
+    fields:
+      - user_sex
+      - partner_sex
+
+  relationship_type:
+    title: "Tipo de vinculo"
+    description: "Amor, amistad o trabajo cambian la lectura final."
+    icon: "Heart"
+    fields:
+      - relationship_type
