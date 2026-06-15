@@ -1,0 +1,110 @@
+questions:
+  user_sign:
+    label: "Tu signo"
+    type: "select"
+    required: true
+    options:
+      - value: aries
+        label: Aries
+      - value: taurus
+        label: Tauro
+      - value: gemini
+        label: Geminis
+      - value: cancer
+        label: Cancer
+      - value: leo
+        label: Leo
+      - value: virgo
+        label: Virgo
+      - value: libra
+        label: Libra
+      - value: scorpio
+        label: Escorpio
+      - value: sagittarius
+        label: Sagitario
+      - value: capricorn
+        label: Capricornio
+      - value: aquarius
+        label: Acuario
+      - value: pisces
+        label: Piscis
+
+  partner_sign:
+    label: "Signo de la otra persona"
+    type: "select"
+    required: true
+    options:
+      - value: aries
+        label: Aries
+      - value: taurus
+        label: Tauro
+      - value: gemini
+        label: Geminis
+      - value: cancer
+        label: Cancer
+      - value: leo
+        label: Leo
+      - value: virgo
+        label: Virgo
+      - value: libra
+        label: Libra
+      - value: scorpio
+        label: Escorpio
+      - value: sagittarius
+        label: Sagitario
+      - value: capricorn
+        label: Capricornio
+      - value: aquarius
+        label: Acuario
+      - value: pisces
+        label: Piscis
+
+  user_age:
+    label: "Tu edad"
+    type: "number"
+    required: true
+    min: 14
+    max: 120
+
+  partner_age:
+    label: "Edad de la otra persona"
+    type: "number"
+    required: true
+    min: 14
+    max: 120
+
+  user_sex:
+    label: "Tu sexo"
+    type: "radio"
+    required: true
+    options:
+      - value: female
+        label: Mujer
+      - value: male
+        label: Hombre
+      - value: other
+        label: Otro
+
+  partner_sex:
+    label: "Sexo de la otra persona"
+    type: "radio"
+    required: true
+    options:
+      - value: female
+        label: Mujer
+      - value: male
+        label: Hombre
+      - value: other
+        label: Otro
+
+  relationship_type:
+    label: "Tipo de compatibilidad"
+    type: "radio"
+    required: true
+    options:
+      - value: love
+        label: Amor
+      - value: friendship
+        label: Amistad
+      - value: work
+        label: Trabajo
