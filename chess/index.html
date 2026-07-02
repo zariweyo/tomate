@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Chess Puzzle</title>
+  <link rel="stylesheet" href="./src/styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero-panel">
+      <a class="home-link" href="../index.html">← Tomate</a>
+      <p class="eyebrow">Puzzle táctico generado por motor</p>
+      <h1>Chess Puzzle</h1>
+      <p class="description">
+        Stockfish genera una línea de partida, se retrocede hasta una posición crítica
+        y tienes hasta 10 movimientos para encontrar el mate con el color ganador.
+      </p>
+      <div class="actions">
+        <button id="new-puzzle-button" class="primary-button">Nuevo puzzle</button>
+        <button id="show-solution-button" class="secondary-button">Mostrar solución</button>
+      </div>
+      <div class="status-card">
+        <span id="status-text">Preparando el tablero…</span>
+      </div>
+    </section>
+
+    <section class="board-panel">
+      <div id="board" class="board" aria-label="Tablero de ajedrez"></div>
+      <div class="game-info">
+        <div>
+          <strong>Color objetivo</strong>
+          <span id="target-color">—</span>
+        </div>
+        <div>
+          <strong>Movimientos restantes</strong>
+          <span id="moves-left">10</span>
+        </div>
+        <div>
+          <strong>Última jugada</strong>
+          <span id="last-move">—</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="solution-panel" class="solution-panel hidden">
+      <h2>Solución</h2>
+      <ol id="solution-list"></ol>
+    </section>
+  </main>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
